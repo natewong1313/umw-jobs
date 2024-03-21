@@ -1,13 +1,6 @@
 import requests
-from geopy.distance import geodesic
 
 from database import connect
-
-
-def calculate_distance(job_location, user_location):
-    job_coords = (job_location[0], job_location[1])
-    return geodesic(job_coords, user_location).km
-
 
 headers = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:123.0) Gecko/20100101 Firefox/123.0",
@@ -59,6 +52,7 @@ def scrape():
     for result in response_json["results"]:
         for hit in result["hits"]:
             parsed_job = parse_job(hit["document"])
+            # print(parsed_job)
             parsed_jobs.append(parsed_job)
             # job_data = hit["document"]
             # db_connection.execute(
@@ -85,6 +79,7 @@ def scrape():
     # print(parsed_jobs)
     # with open("out.json", "w") as out_file:
     #     json.dump(response_json, out_file, indent=2, sort_keys=True)
+    return parsed_jobs
 
 
 def parse_job(job_data):
@@ -94,8 +89,8 @@ def parse_job(job_data):
         "type": job_data["type"],
         "url": job_data["url"],
         "company": {"name": job_data["company_name"], "logo": job_data["company_logo"]},
-        "experience_levels": job_data["experience_level"],
+        "experience_levels": ",".join(job_data["experience_level"]),
         "locations": job_data["geolocations"],
         "remote": job_data["remote"],
-        "skills": job_data["skills"],
+        "skills": ",".join(job_data["skills"]),
     }
