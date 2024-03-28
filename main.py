@@ -12,6 +12,10 @@
 #     app.run(port=8000, debug=True)
 import pandas as pd
 from geopy.distance import geodesic
+from sklearn.compose import make_column_transformer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import make_pipeline
 
 from scraper import scrape
 
@@ -24,12 +28,19 @@ def calculate_distance(job_location, user_location):
 parsed_jobs = scrape()
 job_df = pd.DataFrame(parsed_jobs)
 
-user_info = {
-    "experience": "Junior",
-    "preferedCompanySize": "medium",
-    "location": [37.7749, -122.4194],
-    "skills": ["Python", "Java", "C++"],
-}
 
+col_transformer = make_column_transformer(
+    (CountVectorizer(), "skills"),
+    remainder="drop",
+)
+pipeline = make_pipeline(col_transformer, KNeighborsClassifier(n_neighbors=10))
 
-print(job_df["skills"].str.get_dummies(sep=","))
+X_train = job_df[["skills"]]
+y_train = job_df["title"]
+X_test = pd.DataFrame({"skills": "Java"}, index=[0])
+
+pipeline.fit(X_train, y_train)
+job_title = pipeline.predict(X_test)
+
+# get row that has that title
+print(job_df[job_df["title"] == job_title[0]])
