@@ -19,14 +19,23 @@ from scraper import scrape
 
 
 def calculate_distance(job_location, user_location):
-    job_coords = (job_location[0], job_location[1])
-    return geodesic(job_coords, user_location).km
+    print(job_location)
+    if job_location is None:
+        return 0
+    return geodesic(job_location, user_location).km
 
 
 parsed_jobs = scrape()
 job_df = pd.DataFrame(parsed_jobs)
 
-user = {"skills": "Python,Java", "experience_level": "Junior"}
+user = {
+    "skills": "Python,Java",
+    "experience_level": "Junior",
+    "location": (37.7749, -122.4194),
+}
+# test_distance = job_df.iloc[1]["location"]
+
+# print()
 
 
 def find_jobs_for_user(user):
