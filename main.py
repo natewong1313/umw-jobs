@@ -12,10 +12,8 @@
 #     app.run(port=8000, debug=True)
 import pandas as pd
 from geopy.distance import geodesic
-from sklearn.compose import make_column_transformer
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.pipeline import make_pipeline
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics import pairwise_distances
 
 from scraper import scrape
 
@@ -28,19 +26,28 @@ def calculate_distance(job_location, user_location):
 parsed_jobs = scrape()
 job_df = pd.DataFrame(parsed_jobs)
 
+user = {"skills": "Python,Java", "experience_level": "Junior"}
 
-col_transformer = make_column_transformer(
-    (CountVectorizer(), "skills"),
-    remainder="drop",
-)
-pipeline = make_pipeline(col_transformer, KNeighborsClassifier(n_neighbors=10))
 
-X_train = job_df[["skills"]]
-y_train = job_df["title"]
-X_test = pd.DataFrame({"skills": "Java"}, index=[0])
+def find_jobs_for_user(user):
+    filtered_job_df = job_df[
+        job_df["experience_levels"].str.contains(user["experience_level"])
+    ]
 
-pipeline.fit(X_train, y_train)
-job_title = pipeline.predict(X_test)
+    vec = TfidfVectorizer()
+    vec.fit(filtered_job_df["skills"])
+    tfidf_matrix = vec.transform(filtered_job_df["skills"])
 
-# get row that has that title
-print(job_df[job_df["title"] == job_title[0]])
+    user_features = user["skills"].lower()
+    user_vec = vec.transform([user_features])
+
+    similarities = pairwise_distances(user_vec, tfidf_matrix, metric="cosine")
+
+    matches = similarities.argsort()[0][:5]
+
+    for i, row in enumerate(matches):
+        job = filtered_job_df.iloc[row]
+        print(job["title"] + " | " + job["skills"])
+
+
+find_jobs_for_user(user)
