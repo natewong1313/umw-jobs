@@ -21,7 +21,7 @@ data = {
     "searches": [
         {
             "query_by": "title,company_name,locations",
-            "per_page": 100,
+            "per_page": 200,
             "sort_by": "_text_match:desc,posting_id:desc",
             "highlight_full_fields": "title,company_name,locations",
             "collection": "jobs",
@@ -29,7 +29,7 @@ data = {
             "facet_by": "countries,degrees,experience_level,functions,locations",
             "filter_by": "experience_level:=[`Junior`] && functions:=[`Software Engineering`]",
             "max_facet_values": 50,
-            "page": 1,
+            "page": 2,
         },
     ]
 }
@@ -52,7 +52,7 @@ def scrape():
             jobs = parse_job(hit["document"])
             for job in jobs:
                 parsed_jobs.append(job)
-
+    print(len(parsed_jobs))
     return parsed_jobs
 
 
