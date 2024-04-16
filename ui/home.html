@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMW Jobs</title>
+    <script src="{{ url_for('static', filename='js/tailwind.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}" type="module"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body class="flex flex-col h-screen">
+    <nav class="p-5 flex justify-between">
+        <a href="/" class="text-xl font-semibold flex items-center w-fit">UMW Jobs
+            <span class="text-xs text-orange-500 bg-orange-500/20 px-1.5 py-1 rounded-full ml-2">BETA</span>
+        </a>
+        {% if user.completed_onboarding == True %}
+        <a href="/profile" class="hover:underline">
+            {{ user.first_name }}'s Profile
+        </a>
+        {% endif %}
+    </nav>
+    <div class="bg-neutral-100 flex-1">
+        {% if user.completed_onboarding == True %}
+        {% include 'components/jobs.html' %}
+        {% else %}
+        {% include 'components/onboarding.html' %}
+        {% endif %}
+    </div>
+</body>
+
+</html>

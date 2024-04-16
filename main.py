@@ -3,33 +3,69 @@ import os
 import workos
 from dotenv import load_dotenv
 from flask import Flask, redirect, render_template, request
+from flask_login import LoginManager, UserMixin, current_user, login_user
+from uszipcode import SearchEngine
+
+from database import connect, setup_db
 
 load_dotenv()
+setup_db()
+
 templates_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ui")
 static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ui/static")
 app = Flask(__name__, template_folder=templates_dir, static_folder=static_dir)
 app.config["SECRET_KEY"] = "3ecc98112e60c356c9ab250c"
-# login_manager = flask_login.LoginManager()
-# login_manager.init_app(app)
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
-# app.config["GITHUB_CLIENT_ID"] = "d12a2f046de2cbf7efcb"
-# app.config["GITHUB_CLIENT_SECRET"] = "219c4fd176526b51fc213ebf91ccd29585a70c4d"
-# app.config["GITHUB_ACCESS_TOKEN_URL"] = "https://github.com/login/oauth/access_token"
-# app.config["GITHUB_ACCESS_TOKEN_PARAMS"] = None
-# app.config["GITHUB_AUTHORIZE_URL"] = "https://github.com/login/oauth/authorize"
-# app.config["GITHUB_AUTHORIZE_PARAMS"] = None
-# app.config["GITHUB_API_BASE_URL"] = "https://api.github.com"
-# app.config["GITHUB_CLIENT_KWARGS"] = {"scope": "user:email"}
+login_manager = LoginManager()
+login_manager.init_app(app)
 
-# oauth = OAuth(app)
-# oauth.register(
-#     name="github",
-#     client_id=app.config["GITHUB_CLIENT_ID"],
-#     client_secret=app.config["GITHUB_CLIENT_SECRET"],
-#     authorize_url=app.config["GITHUB_AUTHORIZE_URL"],
-#     access_token_url=app.config["GITHUB_ACCESS_TOKEN_URL"],
-#     client_kwargs=app.config["GITHUB_CLIENT_KWARGS"],
-# )
+
+class User(UserMixin):
+    def __init__(
+        self,
+        id,
+        email,
+        completed_onboarding,
+        first_name,
+        last_name,
+        latitude,
+        longitude,
+    ):
+        self.id = id
+        self.email = email
+        self.completed_onboarding = completed_onboarding
+        self.first_name = first_name
+        self.last_name = last_name
+        self.latitude = latitude
+        self.longitude = longitude
+
+
+@login_manager.user_loader
+def user_loader(id: str):
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE id = %s", (id,))
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if user is None:
+        return None
+    return User(user[0], user[1], user[2], user[3], user[4], user[5], user[6])
+
+
+def add_user(user):
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO users (id, email) VALUES (%s, %s)",
+        (user.id, user.email),
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
+
 
 workos.api_key = os.getenv("WORKOS_API_KEY")
 workos.client_id = os.getenv("WORKOS_CLIENT_ID")
@@ -37,6 +73,8 @@ workos.client_id = os.getenv("WORKOS_CLIENT_ID")
 
 @app.route("/")
 def home():
+    if current_user.is_authenticated:
+        return render_template("home.html", user=current_user)
     return render_template("signin.html")
 
 
@@ -45,19 +83,6 @@ def email_sent():
     return render_template("email_sent.html")
 
 
-# @app.route("/login")
-# def login():
-#     redirect_uri = url_for("callback", _external=True)
-#     return oauth.github.authorize_redirect(redirect_uri)
-
-
-# @app.route("/callback")
-# def callback():
-#     token = oauth.github.authorize_access_token()
-#     user = token.get("userinfo")
-#     if not user:
-#         print(oauth.github.userinfo())
-#     return redirect("/")
 @app.route("/auth", methods=["POST"])
 def auth():
     email = request.form["email"]
@@ -75,7 +100,7 @@ def callback():
     code = request.args.get("code")
     profile_and_token = workos.client.sso.get_profile_and_token(code)
 
-    profile = profile_and_token.profile
+    profile = profile_and_token.profile.to_dict()
     # {
     #     "id": "prof_01HV99BT1PKX9G6VXYAME0629X",
     #     "email": "natewong1@gmail.com",
@@ -88,9 +113,33 @@ def callback():
     #     "idp_id": "natewong1@gmail.com",
     #     "raw_attributes": {},
     # }
-    print(profile.to_dict())
 
-    # Use the information in `profile` for further business logic.
+    user = User(profile["id"], profile["email"])
+    add_user(user)
+    login_user(user)
+    return redirect("/")
+
+
+@app.route("/complete-onboarding", methods=["POST"])
+def complete_onboarding():
+    first_name = request.form["firstName"]
+    last_name = request.form["lastName"]
+    zip_code = request.form["zipCode"]
+
+    search = SearchEngine()
+    location_data = search.by_zipcode(zip_code)
+    latitude = location_data.lat
+    longitude = location_data.lng
+
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute(
+        "UPDATE users SET completed_onboarding = %s, first_name = %s, last_name = %s, latitude = %s, longitude = %s WHERE id = %s",
+        (True, first_name, last_name, latitude, longitude, current_user.id),
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()
 
     return redirect("/")
 

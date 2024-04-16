@@ -1,28 +1,49 @@
-import sqlite3
+import os
+
+import psycopg2
 
 
 # create the jobs table on startup
 def setup_db():
-    conn = sqlite3.connect("database.db")
-    c = conn.cursor()
-    c.execute("""
-CREATE TABLE IF NOT EXISTS jobs (
-    id TEXT PRIMARY KEY,
-    title TEXT,
-    type TEXT,
-    url TEXT,
-    company_name TEXT,
-    company_logo TEXT,
-    experience_levels TEXT,
-    latitude REAL,
-    longitude REAL,
-    remote INTEGER,
-    skills TEXT
-)
-""")
+    conn = connect()
+    cursor = conn.cursor()
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS jobs (
+            id VARCHAR(50) PRIMARY KEY,
+            position VARCHAR(100) NOT NULL,
+            company_name VARCHAR(100) NOT NULL,
+            link VARCHAR(255),
+            latitude DECIMAL(10, 6),
+            longitude DECIMAL(10, 6),
+            description TEXT
+        )
+        """
+    )
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS users (
+            id VARCHAR(50) PRIMARY KEY,
+            email VARCHAR(100) UNIQUE NOT NULL,
+            completed_onboarding BOOLEAN DEFAULT FALSE,
+            first_name VARCHAR(100),
+            last_name VARCHAR(100),
+            latitude DECIMAL(10, 6),
+            longitude DECIMAL(10, 6)
+        )
+        """
+    )
     conn.commit()
+    cursor.close()
     conn.close()
 
 
 def connect():
-    return sqlite3.connect("database.db")
+    print(os.getenv("DB_PASSWORD"))
+    return psycopg2.connect(
+        database=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT"),
+    )
