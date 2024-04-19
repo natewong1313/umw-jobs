@@ -7,6 +7,18 @@ from scraper import scrape
 parsed_jobs = scrape()
 job_df = pd.DataFrame(parsed_jobs)
 
+raw_skills_arr = job_df["skills"].unique()
+skills_arr = []
+for skills in raw_skills_arr:
+    if skills != "":
+        skills_arr.extend(skills.split(","))
+
+skills = list(set(skills_arr))
+
+
+def get_skills():
+    return skills
+
 
 def find_jobs(user):
     filtered_job_df = job_df[

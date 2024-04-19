@@ -29,7 +29,9 @@ def setup_db():
             first_name VARCHAR(100),
             last_name VARCHAR(100),
             latitude DECIMAL(10, 6),
-            longitude DECIMAL(10, 6)
+            longitude DECIMAL(10, 6),
+            experience_level VARCHAR(100),
+            skills TEXT
         )
         """
     )
@@ -39,7 +41,6 @@ def setup_db():
 
 
 def connect():
-    print(os.getenv("DB_PASSWORD"))
     return psycopg2.connect(
         database=os.getenv("DB_NAME"),
         user=os.getenv("DB_USER"),

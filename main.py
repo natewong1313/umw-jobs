@@ -7,6 +7,7 @@ from flask_login import LoginManager, UserMixin, current_user, login_user
 from uszipcode import SearchEngine
 
 from database import connect, setup_db
+from model.find_jobs import get_skills
 
 load_dotenv()
 setup_db()
@@ -74,7 +75,7 @@ workos.client_id = os.getenv("WORKOS_CLIENT_ID")
 @app.route("/")
 def home():
     if current_user.is_authenticated:
-        return render_template("home.html", user=current_user)
+        return render_template("home.html", user=current_user, skills=get_skills())
     return render_template("signin.html")
 
 
@@ -101,18 +102,6 @@ def callback():
     profile_and_token = workos.client.sso.get_profile_and_token(code)
 
     profile = profile_and_token.profile.to_dict()
-    # {
-    #     "id": "prof_01HV99BT1PKX9G6VXYAME0629X",
-    #     "email": "natewong1@gmail.com",
-    #     "first_name": None,
-    #     "last_name": None,
-    #     "groups": None,
-    #     "organization_id": None,
-    #     "connection_id": "conn_01HV998FA8VM5ZYMYPVZT6VKVZ",
-    #     "connection_type": "MagicLink",
-    #     "idp_id": "natewong1@gmail.com",
-    #     "raw_attributes": {},
-    # }
 
     user = User(profile["id"], profile["email"])
     add_user(user)
@@ -125,6 +114,8 @@ def complete_onboarding():
     first_name = request.form["firstName"]
     last_name = request.form["lastName"]
     zip_code = request.form["zipCode"]
+    experience_level = request.form["experienceLevel"]
+    skills = ",".join(request.form.getlist("skills"))
 
     search = SearchEngine()
     location_data = search.by_zipcode(zip_code)
@@ -134,8 +125,17 @@ def complete_onboarding():
     conn = connect()
     cursor = conn.cursor()
     cursor.execute(
-        "UPDATE users SET completed_onboarding = %s, first_name = %s, last_name = %s, latitude = %s, longitude = %s WHERE id = %s",
-        (True, first_name, last_name, latitude, longitude, current_user.id),
+        "UPDATE users SET completed_onboarding = %s, first_name = %s, last_name = %s, latitude = %s, longitude = %s, experience_level = %s, skills = %s WHERE id = %s",
+        (
+            True,
+            first_name,
+            last_name,
+            latitude,
+            longitude,
+            experience_level,
+            skills,
+            current_user.id,
+        ),
     )
     conn.commit()
     cursor.close()

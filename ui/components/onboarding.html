@@ -41,6 +41,22 @@
                 class="outline-0 block w-full rounded-md border-0 py-1.5 pl-9 pr-2 text-neutral-900 ring-1 ring-inset ring-neutral-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-orange-600/50 sm:text-sm sm:leading-6"
                 placeholder="22401">
         </div>
+        <label for="experienceLevel" class="block text-sm font-medium leading-6 text-neutral-900 mt-2">Experience
+            Level</label>
+        <select id="experienceLevel" name="experienceLevel"
+            class="mt-1 block w-full rounded-md h-9 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-orange-600/50 sm:text-sm sm:leading-6 outline-0"
+            required>
+            <option>Intern</option>
+            <option>Entry Level/New Grad</option>
+            <option>Junior</option>
+        </select>
+        <label for="skills" class="block text-sm font-medium leading-6 text-neutral-900 mt-2 mb-1">Location (zip
+            code)</label>
+        <select id="skills" multiple multiselect-search="true" name="skills" required>
+            {% for skill in skills %}
+            <option>{{skill}}</option>
+            {% endfor %}
+        </select>
         <button type="submit" id="onboardingBtn"
             class="group mt-3 border border-neutral-300 w-full py-2 text-sm rounded-md hover:bg-neutral-50 active:bg-neutral-100 font-semibold shadow shadow-sm flex items-center justify-center">
             Submit

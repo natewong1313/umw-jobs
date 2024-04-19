@@ -21,15 +21,26 @@ data = {
     "searches": [
         {
             "query_by": "title,company_name,locations",
-            "per_page": 200,
-            "sort_by": "_text_match:desc,posting_id:desc",
+            "per_page": 21,
+            "sort_by": "_text_match:desc,updated_date:desc",
             "highlight_full_fields": "title,company_name,locations",
             "collection": "jobs",
-            "q": "*",
+            "q": "software engineer",
             "facet_by": "countries,degrees,experience_level,functions,locations",
-            "filter_by": "experience_level:=[`Junior`] && functions:=[`Software Engineering`]",
+            "filter_by": "experience_level:=[`Internship`]",
             "max_facet_values": 50,
-            "page": 2,
+            "page": 1,
+        },
+        {
+            "query_by": "title,company_name,locations",
+            "per_page": 21,
+            "sort_by": "_text_match:desc,updated_date:desc",
+            "highlight_full_fields": "title,company_name,locations",
+            "collection": "jobs",
+            "q": "software engineer",
+            "facet_by": "experience_level",
+            "max_facet_values": 50,
+            "page": 1,
         },
     ]
 }
@@ -52,7 +63,6 @@ def scrape():
             jobs = parse_job(hit["document"])
             for job in jobs:
                 parsed_jobs.append(job)
-    print(len(parsed_jobs))
     return parsed_jobs
 
 
