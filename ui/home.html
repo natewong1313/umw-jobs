@@ -12,14 +12,23 @@
 </head>
 
 <body class="flex flex-col h-screen">
-    <nav class="p-5 flex justify-between">
+    <nav class="h-16 px-5 flex justify-between items-center">
         <a href="/" class="text-xl font-semibold flex items-center w-fit">UMW Jobs
-            <span class="text-xs text-orange-500 bg-orange-500/20 px-1.5 py-1 rounded-full ml-2">BETA</span>
         </a>
         {% if user.completed_onboarding == True %}
-        <a href="/profile" class="hover:underline">
-            {{ user.first_name }}'s Profile
-        </a>
+        <div class="flex items-center">
+            <a href="/matches" class="font-medium text-sm hover:bg-neutral-100 py-2 px-3 rounded-lg">
+                Browse Jobs
+            </a>
+            <a href="/matches"
+                class="font-medium text-neutral-500 text-sm mr-4 hover:bg-neutral-100 py-2 px-3 rounded-lg">
+                Saved Matches
+            </a>
+            <a href="/profile"
+                class="text-orange-500 bg-orange-500/20 h-10 w-10 rounded-full flex items-center justify-center font-semibold hover:opacity-70">
+                {{ user.first_name.0.upper() }}{{ user.last_name.0.upper() }}
+            </a>
+        </div>
         {% endif %}
     </nav>
     <div class="bg-neutral-100 flex-1">

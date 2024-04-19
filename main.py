@@ -74,7 +74,9 @@ workos.client_id = os.getenv("WORKOS_CLIENT_ID")
 
 @app.route("/")
 def home():
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and current_user.completed_onboarding:
+        return render_template("home.html", user=current_user)
+    elif current_user.is_authenticated:
         return render_template("home.html", user=current_user, skills=get_skills())
     return render_template("signin.html")
 
