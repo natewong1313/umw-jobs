@@ -7,7 +7,7 @@ from flask_login import LoginManager, UserMixin, current_user, login_user
 from uszipcode import SearchEngine
 
 from database import connect, setup_db
-from model.find_jobs import get_skills
+from model import find_jobs, get_skills
 
 load_dotenv()
 setup_db()
@@ -32,6 +32,8 @@ class User(UserMixin):
         last_name,
         latitude,
         longitude,
+        experience_level,
+        skills,
     ):
         self.id = id
         self.email = email
@@ -40,6 +42,8 @@ class User(UserMixin):
         self.last_name = last_name
         self.latitude = latitude
         self.longitude = longitude
+        self.experience_level = experience_level
+        self.skills = skills
 
 
 @login_manager.user_loader
@@ -53,7 +57,9 @@ def user_loader(id: str):
 
     if user is None:
         return None
-    return User(user[0], user[1], user[2], user[3], user[4], user[5], user[6])
+    return User(
+        user[0], user[1], user[2], user[3], user[4], user[5], user[6], user[7], user[8]
+    )
 
 
 def add_user(user):
@@ -72,10 +78,27 @@ workos.api_key = os.getenv("WORKOS_API_KEY")
 workos.client_id = os.getenv("WORKOS_CLIENT_ID")
 
 
+def coords_to_location(latitude, longitude):
+    search = SearchEngine()
+    print(float(latitude), float(longitude))
+    return search.by_coordinates(float(latitude), float(longitude), returns=1)[
+        0
+    ].major_city
+
+
+app.jinja_env.globals.update(coords_to_location=coords_to_location)
+
+
 @app.route("/")
 def home():
     if current_user.is_authenticated and current_user.completed_onboarding:
-        return render_template("home.html", user=current_user)
+        jobs = find_jobs(
+            {
+                "skills": current_user.skills,
+                "experience_level": current_user.experience_level,
+            }
+        )
+        return render_template("home.html", user=current_user, jobs=jobs)
     elif current_user.is_authenticated:
         return render_template("home.html", user=current_user, skills=get_skills())
     return render_template("signin.html")

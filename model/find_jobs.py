@@ -1,3 +1,5 @@
+import json
+
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import pairwise_distances
@@ -33,9 +35,9 @@ def find_jobs(user):
     user_vec = vec.transform([user_features])
 
     similarities = pairwise_distances(user_vec, tfidf_matrix, metric="cosine")
-
     matches = similarities.argsort()[0][:5]
 
-    for i, row in enumerate(matches):
-        job = filtered_job_df.iloc[row]
-        print(job["title"] + " | " + job["skills"])
+    # for i, row in enumerate(matches):
+    #     job = filtered_job_df.iloc[row]
+    #     print(job["title"] + " | " + job["skills"])
+    return [json.loads(filtered_job_df.iloc[row].to_json()) for row in matches]

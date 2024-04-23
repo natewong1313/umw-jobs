@@ -1,18 +1,43 @@
 <div class="flex flex-col items-center justify-center h-full">
-    <div class="w-96 h-96 bg-white rounded-xl shadow-sm ring-1 ring-neutral-200">
-
+    <div class="w-96 bg-white rounded-xl shadow-sm ring-1 ring-neutral-200 p-4">
+        <div class="flex items-center font-medium">
+            <img src="{{ jobs[0]['company']['logo'] }}" alt="{{ jobs[0]['company']['name'] }}"
+                class="w-10 h-10 rounded-md mr-2">
+            {{ jobs[0]['company']['name'] }}
+        </div>
+        <h1 class="font-semibold text-lg mt-3">{{ jobs[0]['title'] }}</h1>
+        <p class="text-neutral-500 mt-2">{{ jobs[0]['description'] }}</p>
+        <div class="flex justify-between">
+            <span class="text-neutral-500">Type:</span>
+            <span class="text-neutral-900">{{ jobs[0]['type'] }}</span>
+        </div>
+        <div class="flex justify-between mt-1">
+            <span class="text-neutral-500">Location:</span>
+            <span class="text-neutral-900"> {{coords_to_location(jobs[0]['location'][0], jobs[0]['location'][1])}}
+            </span>
+        </div>
+        <div class="flex justify-between mt-1">
+            <span class="text-neutral-500">Skills:</span>
+            <div class="flex flex-col text-right">
+                {% set skills = jobs[0]["skills"].split(',') %}
+                {% for item in skills %}
+                <p class="text-neutral-900">{{ item }}
+                    <p />
+                    {% endfor %}
+            </div>
+        </div>
     </div>
-    <div class="flex mt-3 space-x-2">
-        <button
-            class="bg-white text-white rounded-full h-20 w-20 p-3 shadow-sm hover:bg-red-500/10 transition-colors"><svg
+    <form class="flex mt-3 space-x-2" type="submit" action="/job-action">
+        <button type="submit"
+            class="bg-white text-white rounded-full h-16 w-16 p-2 shadow-sm hover:bg-red-500/10 transition-colors"><svg
                 xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 48 48">
                 <path fill="#f44336" d="M44,24c0,11.045-8.955,20-20,20S4,35.045,4,24S12.955,4,24,4S44,12.955,44,24z">
                 </path>
                 <path fill="#fff" d="M29.656,15.516l2.828,2.828l-14.14,14.14l-2.828-2.828L29.656,15.516z"></path>
                 <path fill="#fff" d="M32.484,29.656l-2.828,2.828l-14.14-14.14l2.828-2.828L32.484,29.656z"></path>
             </svg></button>
-        <button
-            class="bg-white text-white rounded-full h-20 w-20 p-3 shadow-sm hover:bg-green-500/10 transition-colors"><svg
+        <button type="submit"
+            class="bg-white text-white rounded-full h-16 w-16 p-2 shadow-sm hover:bg-green-500/10 transition-colors"><svg
                 xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 48 48">
                 <linearGradient id="IMoH7gpu5un5Dx2vID39Ra_pIPl8tqh3igN_gr1" x1="9.858" x2="38.142" y1="9.858"
                     y2="38.142" gradientUnits="userSpaceOnUse">
@@ -31,5 +56,5 @@
                     d="M21.293,32.707l-8-8c-0.391-0.391-0.391-1.024,0-1.414l1.414-1.414	c0.391-0.391,1.024-0.391,1.414,0L22,27.758l10.879-10.879c0.391-0.391,1.024-0.391,1.414,0l1.414,1.414	c0.391,0.391,0.391,1.024,0,1.414l-13,13C22.317,33.098,21.683,33.098,21.293,32.707z">
                 </path>
             </svg></button>
-    </div>
+    </form>
 </div>
