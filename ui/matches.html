@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMW Jobs</title>
+    <script src="{{ url_for('static', filename='js/tailwind.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/index.js') }}" type="module"></script>
+    <script src="{{ url_for('static', filename='js/dropdown.js') }}" type="module"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+
+<body class="flex flex-col h-screen">
+    <nav class="h-16 px-5 flex justify-between items-center">
+        <a href="/" class="text-xl font-semibold flex items-center w-fit">UMW Jobs
+        </a>
+        {% if user.completed_onboarding == True %}
+        <div class="flex items-center">
+            <a href="/" class="font-medium text-neutral-500 text-sm mr-4 hover:bg-neutral-100 py-2 px-3 rounded-lg">
+                Browse Jobs
+            </a>
+            <a href="/matches" class="font-medium text-sm hover:bg-neutral-100 py-2 px-3 rounded-lg">
+                Saved Matches
+            </a>
+            <a href="/profile"
+                class="ml-1 text-orange-500 bg-orange-500/20 h-10 w-10 rounded-full flex items-center justify-center font-semibold hover:opacity-70">
+                {{ user.first_name.0.upper() }}{{ user.last_name.0.upper() }}
+            </a>
+        </div>
+        {% endif %}
+    </nav>
+    <div class="bg-neutral-100 flex-1">
+        <div class="p-6">
+            <table class="w-full shadow-md">
+                <thead class="bg-white border-b border-neutral-200">
+                    <tr>
+                        <th class="text-left rounded-tl-lg pl-3 py-2">Job Title</th>
+                        <th class="text-left pl-3">Company</th>
+                        <th class="text-left pl-3">Location</th>
+                        <th class="text-left pl-3">Date Posted</th>
+                        <th class="text-left rounded-tr-lg pl-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job in jobs %}
+                    {% if not loop.last %}
+                    <tr class="hover:bg-neutral-50 border-b border-neutral-200">
+                        {% else %}
+                    <tr class="hover:bg-neutral-50">
+                        {% endif %}
+                        {% if not loop.last %}
+                        <td class="pl-3 py-4">{{job['title']}}</td>
+                        {% else %}
+                        <td class="rounded-b-lg pl-3 py-4">{{job['title']}}</td>
+                        {% endif %}
+                        <td class="pl-3">{{job['employer']}}</td>
+                        <td class="pl-3">{{job['city']}}, {{job['state']}}</td>
+                        <td class="pl-3">{{job['posted_at_readable'].strftime('%m/%d/%Y')}}</td>
+                        <td class="pl-3">
+                            <a target="_blank" href="{{job['link']}}"
+                                class="text-sm text-white bg-blue-500 hover:bg-blue-600 py-1 px-3 rounded-lg">View</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,3 +1,3 @@
-from .find_jobs import find_jobs, get_skills
+from .process import process_jobs
 
-__all__ = ["find_jobs", "get_skills"]
+__all__ = ["process_jobs"]

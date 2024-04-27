@@ -17,7 +17,7 @@
         </a>
         {% if user.completed_onboarding == True %}
         <div class="flex items-center">
-            <a href="/matches" class="font-medium text-sm hover:bg-neutral-100 py-2 px-3 rounded-lg">
+            <a href="/" class="font-medium text-sm hover:bg-neutral-100 py-2 px-3 rounded-lg">
                 Browse Jobs
             </a>
             <a href="/matches"
@@ -25,7 +25,7 @@
                 Saved Matches
             </a>
             <a href="/profile"
-                class="text-orange-500 bg-orange-500/20 h-10 w-10 rounded-full flex items-center justify-center font-semibold hover:opacity-70">
+                class="ml-1 text-orange-500 bg-orange-500/20 h-10 w-10 rounded-full flex items-center justify-center font-semibold hover:opacity-70">
                 {{ user.first_name.0.upper() }}{{ user.last_name.0.upper() }}
             </a>
         </div>

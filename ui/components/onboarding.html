@@ -50,12 +50,28 @@
             <option>Entry Level/New Grad</option>
             <option>Junior</option>
         </select>
-        <label for="skills" class="block text-sm font-medium leading-6 text-neutral-900 mt-2 mb-1">Location (zip
-            code)</label>
+        <label for="skills" class="block text-sm font-medium leading-6 text-neutral-900 mt-2 mb-1">Skills</label>
         <select id="skills" multiple multiselect-search="true" name="skills" required>
             {% for skill in skills %}
             <option>{{skill}}</option>
             {% endfor %}
+        </select>
+        <label for="jobType" class="block text-sm font-medium leading-6 text-neutral-900 mt-2">Preferred Job
+            Type</label>
+        <select id="jobType" name="jobType"
+            class="mt-1 block w-full rounded-md h-9 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-orange-600/50 sm:text-sm sm:leading-6 outline-0"
+            required>
+            <option>Software Engineer</option>
+            <option>Data Science</option>
+        </select>
+        <label for="preferRemote" class="block text-sm font-medium leading-6 text-neutral-900 mt-2">Prefer
+            Remote?</label>
+        <select id="preferRemote" name="preferRemote"
+            class="mt-1 block w-full rounded-md h-9 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-orange-600/50 sm:text-sm sm:leading-6 outline-0"
+            required>
+            <option>Doesn't matter</option>
+            <option>Yes</option>
+            <option>No</option>
         </select>
         <button type="submit" id="onboardingBtn"
             class="group mt-3 border border-neutral-300 w-full py-2 text-sm rounded-md hover:bg-neutral-50 active:bg-neutral-100 font-semibold shadow shadow-sm flex items-center justify-center">
