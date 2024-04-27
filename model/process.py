@@ -22,7 +22,7 @@ def process_jobs(jobs, user, remote_only, max_distance):
 
     if remote_only == "Yes":
         job_df = job_df[job_df["is_remote"]]
-    if max_distance != "":
+    if max_distance != "" and max_distance is not None:
         max_distance = int(max_distance)
         job_df = job_df[job_df["distance"] <= max_distance]
 
